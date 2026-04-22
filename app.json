@@ -2,6 +2,7 @@
   "expo": {
     "name": "pothole-detection-app",
     "slug": "pothole-detection-app",
+    "scheme": "potholedetect",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,19 +13,60 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow camera access to capture pothole images for reporting.",
+        "NSPhotoLibraryUsageDescription": "Allow photo library access to attach pothole images from your gallery.",
+        "NSLocationWhenInUseUsageDescription": "Allow location to show your position on the map, tag reports, and suggest safer routes around potholes.",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
     },
     "android": {
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": ""
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow camera access to capture pothole images."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow photo library access to attach pothole images.",
+          "cameraPermission": "Allow camera access to capture pothole images."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow location for map position, reports, and route suggestions."
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
