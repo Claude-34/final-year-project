@@ -25,7 +25,8 @@ export async function apiFetch(path: string, init: JsonInit = {}) {
     throw new ApiError('API base URL is not configured (src/config/app.config.ts)', 0);
   }
 
-  const url = `${appConfig.apiBaseUrl.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+  // const url = `${appConfig.apiBaseUrl.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+  const url = `http://192.168.1.146:5000${path}`;
 
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -41,6 +42,7 @@ export async function apiFetch(path: string, init: JsonInit = {}) {
 
   let res: Response;
   try {
+    console.log(url)
     res = await fetch(url, { ...init, headers, body });
   } catch (e) {
     const cause = e instanceof Error ? e.message : 'Network error';

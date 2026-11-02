@@ -3,9 +3,12 @@ import cors from 'cors';
 import express from 'express';
 
 import { loadEnv } from './env.js';
+import { createAdminRouter } from './routes/admin.js';
 import { createAuthRouter } from './routes/auth.js';
 import { createInferenceRouter } from './routes/inference.js';
 import { createReportsRouter } from './routes/reports.js';
+import { createUploadsRouter } from './routes/uploads.js';
+import { createWeatherRouter } from './routes/weather.js';
 
 const env = loadEnv();
 const app = express();
@@ -24,6 +27,9 @@ app.get('/health', (_req, res) => {
 
 app.use('/auth', createAuthRouter(env));
 app.use('/reports', createReportsRouter(env));
+app.use('/uploads', createUploadsRouter(env));
+app.use('/admin', createAdminRouter(env));
+app.use('/weather', createWeatherRouter(env));
 app.use('/cv/infer', createInferenceRouter());
 
 app.use((_req, res) => {

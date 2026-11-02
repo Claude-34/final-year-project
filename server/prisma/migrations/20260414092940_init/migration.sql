@@ -12,7 +12,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Report" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
-    "data" JSONB NOT NULL,
+    "data" JSON NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Report_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -23,3 +23,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE INDEX "Report_userId_idx" ON "Report"("userId");
+
+-- CreateIndex
+CREATE INDEX "Report_updatedAt_idx" ON "Report"("updatedAt");

@@ -52,8 +52,6 @@ export const fr: MessageDict = {
   'dashboard.greeting.afternoon': 'Bon après-midi',
   'dashboard.greeting.evening': 'Bonsoir',
   'dashboard.userThere': 'vous',
-  'dashboard.subtitle':
-    'Suivez détections, priorités et signalements au même endroit. Branchez votre backend quand vous êtes prêt.',
   'dashboard.hero.totalDetections': 'Détections totales',
   'dashboard.hero.stubData': 'Données démo · 30 derniers jours',
   'dashboard.hero.triage': '68 % des signalements triés cette semaine',

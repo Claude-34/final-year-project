@@ -21,6 +21,14 @@ const forgotSchema = z.object({
   email: z.string().email(),
 });
 
+function sessionPayload(user: { id: string; name: string; email: string; role: string }, env: Env) {
+  const token = signToken(env, { sub: user.id, email: user.email, role: user.role });
+  return {
+    token,
+    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+  };
+}
+
 export function createAuthRouter(env: Env) {
   const r = Router();
 
@@ -45,11 +53,7 @@ export function createAuthRouter(env: Env) {
         role: 'citizen',
       },
     });
-    const token = signToken(env, { sub: user.id, email: user.email });
-    res.status(201).json({
-      token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    });
+    res.status(201).json(sessionPayload(user, env));
   });
 
   r.post('/login', async (req, res) => {
@@ -69,11 +73,7 @@ export function createAuthRouter(env: Env) {
       res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
-    const token = signToken(env, { sub: user.id, email: user.email });
-    res.json({
-      token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    });
+    res.json(sessionPayload(user, env));
   });
 
   r.post('/forgot-password', async (req, res) => {
@@ -82,7 +82,6 @@ export function createAuthRouter(env: Env) {
       res.status(400).json({ message: 'Invalid email' });
       return;
     }
-    // Stub: integrate email provider in production.
     res.json({ ok: true as const });
   });
 

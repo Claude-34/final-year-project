@@ -1,25 +1,13 @@
 import { Router } from 'express';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import type { Env } from '../env.js';
 import type { AuthedRequest } from '../middleware/auth.js';
 import { requireAuth } from '../middleware/auth.js';
 import { prisma } from '../prisma.js';
+import { reportDataSchema } from '../types/report.js';
 
-const reportSchema = z
-  .object({
-    id: z.string().min(1),
-    imageUrl: z.string(),
-    latitude: z.number(),
-    longitude: z.number(),
-    detectedAt: z.string(),
-    severity: z.enum(['low', 'medium', 'high']),
-    confidence: z.number(),
-    priorityScore: z.number(),
-    status: z.enum(['reported', 'verified', 'assigned', 'in_progress', 'repaired']),
-    reportedBy: z.string(),
-  })
-  .passthrough();
+const reportSchema = reportDataSchema;
 
 export function createReportsRouter(env: Env) {
   const r = Router();

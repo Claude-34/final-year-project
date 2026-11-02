@@ -20,6 +20,7 @@ import {
 } from '@/features/vehicle/vehicle-adjustment';
 import { appConfig } from '@/config/app.config';
 import { createReport } from '@/features/reports/reports.service';
+import { uploadReportImage } from '@/services/api/upload.service';
 import type { PotholeReport, RoadType, TrafficDensity } from '@/types/pothole';
 import { translateForUser, useTranslation } from '@/i18n/useTranslation';
 import { useAuthStore } from '@/store/auth.store';
@@ -168,7 +169,16 @@ export default function DetectionResultScreen() {
     setIsSubmitting(true);
     setSubmitMessage(null);
     try {
-      const saved = await createReport(draftReport);
+      let reportToSave = draftReport;
+      if (resolved.imageUri) {
+        try {
+          const imageUrl = await uploadReportImage(resolved.imageUri);
+          reportToSave = { ...draftReport, imageUrl };
+        } catch {
+          // Cloudinary may be unset locally — keep local URI
+        }
+      }
+      const saved = await createReport(reportToSave);
       setSubmitMessage(t('detection.saved', { id: saved.id }));
       useNotificationsStore.getState().pushNotification({
         title: translateForUser('notify.report.title'),

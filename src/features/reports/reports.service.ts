@@ -67,7 +67,7 @@ export async function createReport(report: PotholeReport): Promise<CreateReportR
     await mergeReportIntoLocalCache(report);
     return res;
   } catch (e) {
-    if (e instanceof ApiError && e.status === 0) {
+    if (e instanceof ApiError && e.status !== 0) {
       throw e;
     }
 

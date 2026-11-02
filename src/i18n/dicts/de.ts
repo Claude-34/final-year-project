@@ -53,8 +53,6 @@ export const de: MessageDict = {
   'dashboard.greeting.afternoon': 'Guten Tag',
   'dashboard.greeting.evening': 'Guten Abend',
   'dashboard.userThere': 'dort',
-  'dashboard.subtitle':
-    'Erfassungen, Prioritäten und Meldungen an einem Ort. Backend bei Bedarf anbinden.',
   'dashboard.hero.totalDetections': 'Erfassungen gesamt',
   'dashboard.hero.stubData': 'Demo-Daten · letzte 30 Tage',
   'dashboard.hero.triage': '68 % der Meldungen diese Woche gesichtet',

@@ -4,6 +4,12 @@ const appJson = require('./app.json');
 module.exports = {
   expo: {
     ...appJson.expo,
+
+    plugins: [
+      ...(appJson.expo.plugins ?? []),
+      "expo-localization",
+    ],
+
     extra: {
       ...(appJson.expo.extra ?? {}),
       apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',

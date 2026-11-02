@@ -2,6 +2,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Local dev: SQLite (no Docker required). Production on Render: switch provider to "postgresql".
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
@@ -26,4 +27,5 @@ model Report {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([updatedAt])
 }

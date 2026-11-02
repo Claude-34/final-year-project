@@ -1,70 +1,86 @@
-# Pothole Detection (Expo Router) — Final Year Project Scaffold
+# Pothole Detection — Final Year Project
 
-Built with **Expo SDK 54** (React Native 0.81, React 19.1).
+Built with **Expo SDK 54** (mobile), **Express + PostgreSQL** (API), and **Next.js** (authority admin dashboard).
 
-This repository is a **feature-based** React Native + Expo app scaffold for:
+## Features
 
-- pothole image capture (camera + GPS tagging)
-- computer vision detection (on-device or API — stubbed until backend/model is connected)
-- prioritization scoring (weighted multi-criteria engine)
-- reporting + map-oriented workflows (UI shells)
+- Mobile: pothole capture (camera + GPS), CV detection stub, prioritization, reports, maps
+- API: JWT auth, report CRUD, Cloudinary image upload, admin triage endpoints
+- Admin web: login, KPI dashboard, report list/detail, status and crew assignment
 
 ## Prerequisites
 
-- Node.js + npm
-- Expo Go (phone) or an emulator setup
+- Node.js 20+ and npm
+- Docker (for local PostgreSQL) or a hosted Postgres URL
+- Expo Go or emulator (mobile)
+- Cloudinary account (for cloud image storage in production)
 
-## Run
+## Quick start
+
+### 1. Env files
+
+```bash
+cp server/.env.example server/.env
+cp admin-web/.env.example admin-web/.env.local
+```
+
+Local dev uses **SQLite** (`DATABASE_URL="file:./dev.db"`) — no Docker required.  
+For production Postgres on Render, see `server/prisma/schema.postgres.prisma` and [DEPLOY.md](./DEPLOY.md).
+
+### 2. API
+
+```bash
+cd server && npm install && npx prisma db push && npm run db:seed
+cd .. && npm run api
+```
+
+Default admin: **admin@authority.local** / **AdminChangeMe1!** (or your `ADMIN_SEED_PASSWORD`).
+
+### 3. Admin dashboard
+
+```bash
+cd admin-web && npm install
+cd .. && npm run admin
+```
+
+Open http://localhost:3001
+
+### 4. Mobile app
 
 ```bash
 npm install
+# .env: EXPO_PUBLIC_API_BASE_URL=http://YOUR_LAN_IP:3000
 npm run start
 ```
 
-## Project structure (high level)
+When `EXPO_PUBLIC_API_BASE_URL` is empty, the app runs in **stub mode** (local auth/reports).
 
-- `src/app/`: Expo Router routes only (`_layout.tsx`, screens)
-- `src/components/`: reusable UI
-- `src/features/`: domain logic (auth, capture, detection, prioritization, reports, maps)
-- `src/services/`: integrations (API, storage, connectivity, notifications)
-- `src/store/`: Zustand global state (auth/session/UI flags)
-- `src/hooks/`: cross-cutting hooks
-- `src/theme/`, `src/utils/`, `src/types/`, `src/config/`
+## Project structure
 
-## Configure backend (next)
+| Path | Description |
+|------|-------------|
+| `src/` | Expo mobile app |
+| `server/` | Express API + Prisma |
+| `admin-web/` | Next.js authority console |
+| `docker-compose.yml` | Local PostgreSQL |
+| `DEPLOY.md` | Render + Vercel deployment |
 
-Set your API base URL in:
+## API routes
 
-- `src/config/app.config.ts` → `apiBaseUrl`
+| Route | Auth | Description |
+|-------|------|-------------|
+| `POST /auth/login` | — | Login |
+| `POST /auth/register` | — | Citizen signup |
+| `GET/POST /reports` | JWT | User reports |
+| `POST /uploads/image` | JWT | Cloudinary upload |
+| `GET /admin/stats` | Admin | KPIs |
+| `GET/PATCH /admin/reports/:id` | Admin | Triage |
 
-When `apiBaseUrl` is empty, the app runs in **stub mode**:
+## Deployment
 
-- auth uses demo tokens stored via `expo-secure-store`
-- CV inference returns deterministic stub outputs in `src/features/detection/inference.service.ts`
-- reports save locally via AsyncStorage in `src/features/reports/reports.service.ts`
-
-## Map (react-native-maps)
-
-- **iOS**: Uses Apple Maps in Expo Go / dev builds; no API key required for the default map.
-- **Android**: Set your Google Maps SDK key in `app.json` → `expo.android.config.googleMaps.apiKey`. Without a valid key, the map may appear blank on Android. Create a key in [Google Cloud Console](https://console.cloud.google.com/) with **Maps SDK for Android** enabled.
-- **Web**: The Map tab uses [`map.web.tsx`](src/app/(tabs)/map.web.tsx) — `react-native-maps` is not supported on web.
-
-## Permissions
-
-Configured in `app.json` plugins for:
-
-- camera / image picker
-- location
-- secure storage
-
-## MVP roadmap (implementation order)
-
-1. **Backend**: auth + report CRUD + image upload (S3/Cloudinary/Firebase Storage)
-2. **CV**: connect `endpoints.inference` to your model service (YOLO/etc.)
-3. **Maps**: replace map stub UI with `react-native-maps` markers/clusters + filters
-4. **Offline**: expand `offline-queue.ts` replay + conflict handling
-5. **Prioritization**: replace stub risk/frequency signals with real GIS + historical crash data
+See [DEPLOY.md](./DEPLOY.md) for Render (API + Postgres) and Vercel (admin).
 
 ## Notes
 
-- This folder name contains spaces; local tooling is fine, but some CLIs are picky — prefer quoting paths in terminals.
+- Folder name contains spaces — quote paths in terminals.
+- Android emulator API URL: `http://10.0.2.2:3000`

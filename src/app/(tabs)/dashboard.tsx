@@ -1,12 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, type Href } from 'expo-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 import { Screen } from '@/components/common/Screen';
 import { SeverityBadge } from '@/components/potholes/SeverityBadge';
+import { appConfig } from '@/config/app.config';
 import { demoPredictiveContext } from '@/features/prediction/demo-context';
-import { estimateWeeksUntilLikelyDamage } from '@/features/prediction/road-risk';
+import { estimateWeeksUntilLikelyDamage, type PredictiveContext } from '@/features/prediction/road-risk';
+import { fetchWeatherContext, mergePredictiveContext } from '@/features/prediction/weather.service';
+import { useLocation } from '@/hooks/useLocation';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useAuthStore } from '@/store/auth.store';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -38,14 +41,30 @@ export default function DashboardScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const shadow = useMemo(() => cardShadow(isDark), [isDark]);
   const displayName = userName ?? t('dashboard.userThere');
-  const predWeeks = useMemo(() => estimateWeeksUntilLikelyDamage(demoPredictiveContext), []);
+  const [predCtx, setPredCtx] = useState<PredictiveContext>(demoPredictiveContext);
+  const { refresh } = useLocation();
+  const predWeeks = useMemo(() => estimateWeeksUntilLikelyDamage(predCtx), [predCtx]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!appConfig.apiBaseUrl) return;
+      const c = await refresh();
+      if (cancelled || !c) return;
+      const wx = await fetchWeatherContext(c.latitude, c.longitude);
+      if (cancelled || !wx || wx.available !== true) return;
+      setPredCtx(mergePredictiveContext(demoPredictiveContext, wx.rainfallIndex));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refresh]);
 
   return (
     <Screen>
       <View style={styles.header}>
         <Text style={styles.kicker}>{t(greetingKey())}</Text>
         <Text style={styles.title}>{displayName}</Text>
-        <Text style={styles.subtitle}>{t('dashboard.subtitle')}</Text>
       </View>
 
       <View style={[styles.hero, shadow]}>
@@ -336,13 +355,6 @@ function createStyles(colors: ThemeColors) {
       fontWeight: '800',
       color: colors.text,
       letterSpacing: -0.5,
-    },
-    subtitle: {
-      marginTop: spacing.sm,
-      fontSize: 15,
-      lineHeight: 22,
-      color: colors.mutedText,
-      maxWidth: 340,
     },
     hero: {
       marginTop: spacing.md,
